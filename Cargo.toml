@@ -1,0 +1,7 @@
+[package]
+name = "simple-config-drive"
+version = "0.0.1"
+authors = [ "mordred@inaugust.com" ]
+
+[dependencies]
+rustc-serialize = "~0.3"
