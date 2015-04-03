@@ -23,7 +23,6 @@ use std::path::{Path, PathBuf};
 use std::env;
 
 mod options;
-mod test;
 
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them

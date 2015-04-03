@@ -14,9 +14,6 @@
 // limitations under the License.
 
 
-use super::*;
-
-#[cfg(test)]
 #[test]
 fn it_works() {
 }
