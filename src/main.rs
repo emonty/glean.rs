@@ -4,7 +4,7 @@ use rustc_serialize::{json, Decodable, Decoder};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::env;
 
 // Automatically generate `Decodable` and `Encodable` trait
@@ -83,15 +83,10 @@ pub struct VendorData {
     network_info: NetworkInfo,
 }
 
-fn main() {
-
-    let vendor_data_path = env::current_dir().unwrap().join(
-        Path::new("samples/rax/openstack/latest/vendor_data.json"));
-    let display = vendor_data_path.display();
-    println!("{}", display);
-
+fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
+    let display = data_path.display();
     // Needs to be mutable because reading from it apparently involves change
-    let mut file = match File::open(&vendor_data_path) {
+    let mut file = match File::open(&data_path) {
         Err(why) => panic!(
             "couldn't open {}: {}", display, Error::description(&why)),
         Ok(file) => file,
@@ -103,11 +98,40 @@ fn main() {
             "couldn't read {}: {}", display, Error::description(&why)),
         Ok(ret) => ret
     };
-    let vendor_data: VendorData = match json::decode(&s) {
-        Err(why) => panic!(
-            "Could not decode {}: {}", display, Error::description(&why)),
-        Ok(vendor_data) => vendor_data
-    };
-    let netinfo = vendor_data.network_info;
-    println!("{:?}", netinfo.networks[0]);
+
+    if data_path.file_name().unwrap() == "vendor_data.json" {
+        let data: VendorData = match json::decode(&s) {
+            Err(why) => panic!(
+                "Could not decode {}: {}", display, Error::description(&why)),
+            Ok(data) => data
+        };
+        let netinfo = data.network_info;
+        return Some(netinfo);
+    } else if data_path.file_name().unwrap() == "network_info.json" {
+        let data: NetworkInfo = match json::decode(&s) {
+            Err(why) => panic!(
+                "Could not decode {}: {}", display, Error::description(&why)),
+            Ok(data) => data
+        };
+        return Some(data);
+    }
+    return None;
+}
+
+fn main() {
+
+    let vendor_data_path = env::current_dir().unwrap().join(
+        Path::new("samples/rax/openstack/latest/vendor_data.json"));
+    let vendor_display = vendor_data_path.display();
+    println!("{}", vendor_display);
+    let vendor_netinfo = get_network_info(&vendor_data_path);
+    println!("{:?}", vendor_netinfo.unwrap().networks[0]);
+
+    let network_info_path = env::current_dir().unwrap().join(
+        Path::new("samples/liberty/openstack/latest/network_info.json"));
+    let network_display = network_info_path.display();
+    println!("{}", network_display);
+    let netinfo = get_network_info(&network_info_path);
+
+    println!("{:?}", netinfo.unwrap().networks[0]);
 }
