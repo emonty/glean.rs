@@ -23,6 +23,7 @@ use std::path::{Path, PathBuf};
 use std::env;
 
 mod options;
+mod test;
 
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them
@@ -137,6 +138,7 @@ fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
 }
 
 
+#[cfg(not(test))]
 fn main() {
 
     let opts = options::get_options();
@@ -159,13 +161,4 @@ fn main() {
     let netinfo = get_network_info(&network_info_path);
 
     println!("{:?}", netinfo.unwrap().networks[0]);
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-    }
 }
