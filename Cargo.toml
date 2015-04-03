@@ -1,5 +1,5 @@
 [package]
-name = "simple-config-drive"
+name = "gleam"
 version = "0.0.1"
 authors = [ "mordred@inaugust.com" ]
 

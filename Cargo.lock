@@ -1,5 +1,5 @@
 [root]
-name = "simple-config-drive"
+name = "gleam"
 version = "0.0.1"
 dependencies = [
  "rustc-serialize 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
