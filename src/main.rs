@@ -22,6 +22,8 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::env;
 
+mod options;
+
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them
 // Do Debug traits so that we can print things
@@ -134,7 +136,14 @@ fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
     return None;
 }
 
+
 fn main() {
+
+    let opts = options::get_options();
+    if opts.help {
+        println!("{}", opts.usage);
+        return;
+    }
 
     let vendor_data_path = env::current_dir().unwrap().join(
         Path::new("samples/rax/openstack/latest/vendor_data.json"));
@@ -150,4 +159,13 @@ fn main() {
     let netinfo = get_network_info(&network_info_path);
 
     println!("{:?}", netinfo.unwrap().networks[0]);
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+    }
 }
