@@ -65,13 +65,13 @@ pub struct VendorData {
 
 fn main() {
 
-    let vendor_data_file = env::current_dir().unwrap().join(
+    let vendor_data_path = env::current_dir().unwrap().join(
         Path::new("samples/rax/openstack/latest/vendor_data.json"));
-    println!("{}", vendor_data_file.display());
-    let display = vendor_data_file.display();
+    let display = vendor_data_path.display();
+    println!("{}", display);
 
     // Needs to be mutable because reading from it apparently involves change
-    let mut file = match File::open(&vendor_data_file) {
+    let mut file = match File::open(&vendor_data_path) {
         Err(why) => panic!(
             "couldn't open {}: {}", display, Error::description(&why)),
         Ok(file) => file,
