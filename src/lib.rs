@@ -21,8 +21,6 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
 
-pub mod options;
-
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them
 // Do Debug traits so that we can print things

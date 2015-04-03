@@ -16,7 +16,9 @@
 extern crate gleam;
 use std::path::Path;
 use std::env;
-use gleam::{options, get_network_info};
+use gleam::get_network_info;
+
+mod options;
 
 #[cfg(not(test))]
 fn main() {

@@ -9,7 +9,7 @@ getopts = "0.2.4"
 
 [lib]
 name = "gleam"
-path = "src/lib/lib.rs"
+path = "src/lib.rs"
 
 [[bin]]
 name = "gleam"
