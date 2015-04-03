@@ -83,7 +83,11 @@ fn main() {
             "couldn't read {}: {}", display, Error::description(&why)),
         Ok(ret) => ret
     };
-    let vendor_data: VendorData = json::decode(&s).unwrap();
+    let vendor_data: VendorData = match json::decode(&s) {
+        Err(why) => panic!(
+            "Could not decode {}: {}", display, Error::description(&why)),
+        Ok(vendor_data) => vendor_data
+    };
     let netinfo = vendor_data.network_info;
     println!("{:?}", netinfo.networks[0]);
 }
