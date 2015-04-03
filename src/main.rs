@@ -1,3 +1,18 @@
+// Copyright (c) 2015 Hewlett-Packard Development Company, L.P.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+// implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #![feature(custom_derive)]
 extern crate rustc_serialize;
 use rustc_serialize::{json, Decodable, Decoder};
@@ -7,10 +22,11 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::env;
 
-// Automatically generate `Decodable` and `Encodable` trait
-// implementations
+// Automatically generate `Decodable` trait implementations
+// Don't generate `Encodable` because we don't use them
+// Do Debug traits so that we can print things
 
-#[derive(RustcEncodable, Debug)]
+#[derive(Debug)]
 pub struct Service {
     service_type: String,
     address: String,
@@ -28,14 +44,14 @@ impl Decodable for Service {
 }
 
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, Debug)]
 pub struct Route {
     netmask: String,
     network: String,
     gateway: String,
 }
 
-#[derive(RustcEncodable, Debug)]
+#[derive(Debug)]
 pub struct Network {
     network_id: String,
     network_type: String,
@@ -63,7 +79,7 @@ impl Decodable for Network {
   }
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, Debug)]
 pub struct Link {
     ethernet_mac_address: String,
     mtu: u16,
@@ -71,14 +87,14 @@ pub struct Link {
     vif_id: String,
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, Debug)]
 pub struct NetworkInfo {
     services: Vec<Service>,
     networks: Vec<Network>,
     links: Vec<Link>,
 }
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
+#[derive(RustcDecodable, Debug)]
 pub struct VendorData {
     network_info: NetworkInfo,
 }
