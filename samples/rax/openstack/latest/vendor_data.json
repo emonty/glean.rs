@@ -2,18 +2,18 @@
   "network_info": {
     "services": [
       {
-        "service_type": "dns",
+        "type": "dns",
         "address": "72.3.128.241"
       },
       {
-        "service_type": "dns",
+        "type": "dns",
         "address": "72.3.128.240"
       }
     ],
     "networks": [
       {
         "network_id": "00000000-0000-0000-0000-000000000000",
-        "network_type": "ipv4",
+        "type": "ipv4",
         "netmask": "255.255.255.0",
         "link": "tapfafb5c05-a6",
         "routes": [
@@ -28,7 +28,7 @@
       },
       {
         "network_id": "11111111-1111-1111-1111-111111111111",
-        "network_type": "ipv4",
+        "type": "ipv4",
         "netmask": "255.255.224.0",
         "link": "tape501e1cd-10",
         "routes": [
