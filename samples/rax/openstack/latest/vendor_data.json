@@ -51,14 +51,14 @@
       {
         "ethernet_mac_address": "BC:76:4E:01:62:86",
         "mtu": 1500,
-        "link_type": null,
+        "type": null,
         "id": "tapfafb5c05-a6",
         "vif_id": "fafb5c05-a661-48ae-9810-46601c7e22d1"
       },
       {
         "ethernet_mac_address": "BC:76:4E:05:7B:06",
         "mtu": 1500,
-        "link_type": null,
+        "type": null,
         "id": "tape501e1cd-10",
         "vif_id": "e501e1cd-10d0-4e63-b0c2-6542989ccbb2"
       }

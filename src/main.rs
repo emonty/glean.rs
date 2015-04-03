@@ -9,12 +9,6 @@ use std::env;
 
 // Automatically generate `RustcDecodable` and `RustcEncodable` trait
 // implementations
-#[derive(RustcDecodable, RustcEncodable, Debug)]
-pub struct TestStruct  {
-    data_int: u8,
-    data_str: String,
-    data_vector: Vec<u8>,
-}
 
 #[derive(RustcDecodable, RustcEncodable, Debug)]
 pub struct Service {
@@ -44,7 +38,6 @@ pub struct Network {
 pub struct Link {
     ethernet_mac_address: String,
     mtu: u16,
-    link_type: Option<String>,
     id: String,
     vif_id: String,
 }
@@ -59,8 +52,6 @@ pub struct NetworkInfo {
 #[derive(RustcDecodable, RustcEncodable, Debug)]
 pub struct VendorData {
     network_info: NetworkInfo,
-    region: Option<String>,
-    ip_whitelist: Option<Vec<String>>,
 }
 
 fn main() {
