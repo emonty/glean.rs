@@ -65,43 +65,25 @@ pub struct VendorData {
 
 fn main() {
 
-    let vendor_data_file = env::current_dir().unwrap().join(Path::new("samples/rax/openstack/latest/vendor_data.json"));
+    let vendor_data_file = env::current_dir().unwrap().join(
+        Path::new("samples/rax/openstack/latest/vendor_data.json"));
     println!("{}", vendor_data_file.display());
     let display = vendor_data_file.display();
 
     // Needs to be mutable because reading from it apparently involves change
     let mut file = match File::open(&vendor_data_file) {
-        Err(why) => panic!("couldn't open {}: {}", display,
-                                                   Error::description(&why)),
+        Err(why) => panic!(
+            "couldn't open {}: {}", display, Error::description(&why)),
         Ok(file) => file,
     };
 
     let mut s = String::new();
     match file.read_to_string(&mut s) {
-        Err(why) => panic!("couldn't read {}: {}", display,
-                           Error::description(&why)),
-        // HOW do I do nothing here
-        Ok(_) => print!("decoded"), // {} contains:\n{}", display, s),
-    }
+        Err(why) => panic!(
+            "couldn't read {}: {}", display, Error::description(&why)),
+        Ok(ret) => ret
+    };
     let vendor_data: VendorData = json::decode(&s).unwrap();
     let netinfo = vendor_data.network_info;
     println!("{:?}", netinfo.networks[0]);
-
-    let object = TestStruct {
-        data_int: 1,
-        data_str: "homura".to_string(),
-        data_vector: vec![2,3,4,5],
-    };
-    let raw_string = r#"{"data_int":1,"data_str":"homura","data_vector":[2,3,4,5]}"#;
-
-
-    // Serialize using `json::encode`
-    let encoded = json::encode(&object).unwrap();
-
-    // Deserialize using `json::decode`
-    let decoded: TestStruct = json::decode(&encoded).unwrap();
-    let raw_decoded: TestStruct = json::decode(raw_string).unwrap();
-    println!("{}", encoded);
-    println!("{}", decoded.data_str);
-    println!("{}", raw_decoded.data_str);
 }
