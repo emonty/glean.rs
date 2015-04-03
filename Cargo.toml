@@ -7,5 +7,14 @@ authors = [ "mordred@inaugust.com" ]
 rustc-serialize = "~0.3"
 getopts = "0.2.4"
 
+[lib]
+name = "gleam"
+path = "src/lib/lib.rs"
+
+[[bin]]
+name = "gleam"
+test = false
+doc = false
+
 [[test]]
 name = "tests"

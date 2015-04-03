@@ -13,7 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+extern crate gleam;
+use gleam::Service;
 
 #[test]
 fn it_works() {
+
+    let foo = Service {
+        service_type: "foo".to_string(),
+        address: "foo".to_string(),
+    };
 }

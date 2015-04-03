@@ -19,10 +19,9 @@ use rustc_serialize::{json, Decodable, Decoder};
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::{Path, PathBuf};
-use std::env;
+use std::path::PathBuf;
 
-mod options;
+pub mod options;
 
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them
@@ -30,8 +29,8 @@ mod options;
 
 #[derive(Debug)]
 pub struct Service {
-    service_type: String,
-    address: String,
+    pub service_type: String,
+    pub address: String,
 }
 
 impl Decodable for Service {
@@ -92,7 +91,7 @@ pub struct Link {
 #[derive(RustcDecodable, Debug)]
 pub struct NetworkInfo {
     services: Vec<Service>,
-    networks: Vec<Network>,
+    pub networks: Vec<Network>,
     links: Vec<Link>,
 }
 
@@ -101,7 +100,7 @@ pub struct VendorData {
     network_info: NetworkInfo,
 }
 
-fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
+pub fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
     let display = data_path.display();
     // Needs to be mutable because reading from it apparently involves change
     let mut file = match File::open(&data_path) {
@@ -134,30 +133,4 @@ fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
         return Some(data);
     }
     return None;
-}
-
-
-#[cfg(not(test))]
-fn main() {
-
-    let opts = options::get_options();
-    if opts.help {
-        println!("{}", opts.usage);
-        return;
-    }
-
-    let vendor_data_path = env::current_dir().unwrap().join(
-        Path::new("samples/rax/openstack/latest/vendor_data.json"));
-    let vendor_display = vendor_data_path.display();
-    println!("{}", vendor_display);
-    let vendor_netinfo = get_network_info(&vendor_data_path);
-    println!("{:?}", vendor_netinfo.unwrap().networks[0]);
-
-    let network_info_path = env::current_dir().unwrap().join(
-        Path::new("samples/liberty/openstack/latest/network_info.json"));
-    let network_display = network_info_path.display();
-    println!("{}", network_display);
-    let netinfo = get_network_info(&network_info_path);
-
-    println!("{:?}", netinfo.unwrap().networks[0]);
 }
