@@ -14,7 +14,7 @@
 // limitations under the License.
 
 extern crate gleam;
-use gleam::InterfaceMap;
+use gleam::config_drive::InterfaceMap;
 use gleam::sys::SysInterfaces;
 
 mod options;
