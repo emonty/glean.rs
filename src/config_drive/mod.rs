@@ -20,6 +20,7 @@ mod network_info;
 
 pub struct ConfigDrive {
     pub interface_map: HashMap<String, network_info::Network>,
+    pub dns: Vec<String>,
 }
 
 impl ConfigDrive {
@@ -33,7 +34,9 @@ impl ConfigDrive {
             debug!("Trying Path: {}", path);
             match network_info::NetworkInfo::new(root, &data_path) {
                 Some(info) => return Some(ConfigDrive{
-                    interface_map: info.get_interface_map() }),
+                    interface_map: info.get_interface_map(),
+                    dns: info.get_dns()
+                }),
                 None => {},
             };
         }

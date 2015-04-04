@@ -130,6 +130,16 @@ impl NetworkInfo {
         }
         return interfaces;
     }
+
+    pub fn get_dns(&self) -> Vec<String> {
+        let mut dns = Vec::new();
+        for service in self.services.iter() {
+            if service.service_type == "dns" {
+                dns.push(service.address.clone());
+            }
+        }
+        return dns;
+    }
 }
 
 fn read_string_from_file(root_path: &PathBuf, display: &Display) -> Option<String> {

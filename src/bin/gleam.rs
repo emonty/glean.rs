@@ -30,7 +30,10 @@ fn main() {
 
     let config_drive = ConfigDrive::new(&opts.root);
     match config_drive {
-        Some(interface) => println!("{:?}", interface.interface_map),
+        Some(interface) => {
+            println!("Network {:?}", interface.interface_map);
+            println!("DNS {:?}", interface.dns);
+        },
         None => {}
     }
 
