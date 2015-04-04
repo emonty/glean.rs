@@ -30,7 +30,7 @@ impl ConfigDrive {
             ];
         for path in paths {
             let data_path = PathBuf::from(path);
-            println!("Trying Path: {}", path);
+            debug!("Trying Path: {}", path);
             match network_info::NetworkInfo::new(root, &data_path) {
                 Some(info) => return Some(ConfigDrive{
                     interface_map: info.get_interface_map() }),
