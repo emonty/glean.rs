@@ -24,40 +24,54 @@ pub struct Interface {
 }
 
 impl Interface {
-  pub fn new(path: &PathBuf) -> Option<Interface> {
+  pub fn new(path: &PathBuf, noop: bool) -> Option<Interface> {
       let iface = path.as_path().file_name().unwrap();
       if iface == "lo" {
           return None;
       }
-      let mut assign_type_file = match File::open(path.join("addr_assign_type")) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(file) => file,
+      let assign_type = match get_file_value(&path.join("addr_assign_type")) {
+        None => return None,
+        Some(value) => value,
       };
-      let newline = '\n';
-      let mut assign_type = String::new();
-      match assign_type_file.read_to_string(&mut assign_type) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(_) => {},
-      };
-      let trimmed_assign_type = assign_type.trim_matches(newline);
-      debug!("Type is: ::{}::", trimmed_assign_type);
-      if trimmed_assign_type != "0" {
+      if assign_type != "0" {
           return None
       }
-      let mut address_file = match File::open(path.join("address")) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(file) => file,
+
+      // Check to see if it's a live interface
+      let carrier = match get_file_value(&path.join("carrier")) {
+        None => return None,
+        Some(value) => value,
       };
-      let mut address = String::new();
-      match address_file.read_to_string(&mut address) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(_) => {},
+      if carrier != "1" {
+          return None
+      }
+      // This will be there so do things with ip link set dev {} up
+      if noop { }
+
+      let address = match get_file_value(&path.join("address")) {
+        None => return None,
+        Some(value) => value,
       };
-      let trimmed_address = address.trim_matches(newline);
-      debug!("Address is: ::{}::", trimmed_address);
+
       Some(Interface {
-         address: String::from_str(trimmed_address),
+         address: address,
          iface: String::from_str(iface.to_str().unwrap()),
       })
   }
+}
+
+fn get_file_value(path: &PathBuf) -> Option<String> {
+  let newline = '\n';
+  let mut file_obj = match File::open(path) {
+    Err(why) => { debug!("{}", why); return None},
+    Ok(file) => file,
+  };
+  let mut raw_value = String::new();
+  match file_obj.read_to_string(&mut raw_value) {
+    Err(why) => { debug!("{}", why); return None},
+    Ok(_) => {},
+  };
+  let value = raw_value.trim_matches(newline);
+  debug!("File {} value is: ::{}::", path.display(), value);
+  return Some(String::from_str(value));
 }

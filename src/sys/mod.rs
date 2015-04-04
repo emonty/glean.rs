@@ -25,7 +25,7 @@ pub struct SysInterfaces {
 }
 
 impl SysInterfaces {
-  pub fn new(root: &Option<String>, interface: &Option<String>) -> SysInterfaces {
+  pub fn new(root: &Option<String>, interface: &Option<String>, noop: bool) -> SysInterfaces {
 
       let base_root_path = match root {
           &Some(ref path) => PathBuf::from(path),
@@ -35,19 +35,19 @@ impl SysInterfaces {
       debug!("Root Path {:?}", root_path);
       SysInterfaces {
           root: PathBuf::from(&root_path),
-          interfaces: get_interfaces(&root_path, interface),
+          interfaces: get_interfaces(&root_path, interface, noop),
       }
   }
 }
 
-fn get_interfaces(root_path: &PathBuf, interface: &Option<String>) -> Vec<interface::Interface> {
+fn get_interfaces(root_path: &PathBuf, interface: &Option<String>, noop: bool) -> Vec<interface::Interface> {
     let interface_paths = match interface {
-        &Some(ref iface) => vec![PathBuf::from(iface)],
+        &Some(ref iface) => vec![root_path.join(iface)],
         &None => read_interfaces(root_path),
     };
     let mut interfaces = Vec::new();
     for path in interface_paths {
-        let interface = interface::Interface::new(&path);
+        let interface = interface::Interface::new(&path, noop);
         match interface {
             None => {}
             Some(iface) => interfaces.push(iface),

@@ -37,7 +37,7 @@ fn main() {
         None => {}
     }
 
-    let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface);
+    let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface, opts.noop);
 
     println!("{:?}", sys_interfaces);
 }
