@@ -95,18 +95,25 @@ pub struct NetworkInfo {
     links: Vec<Link>,
 }
 
+#[derive(RustcDecodable, Debug)]
+pub struct VendorData {
+    network_info: NetworkInfo,
+}
+
 impl NetworkInfo {
     pub fn new(root: &Option<String>, data_path: &PathBuf) -> Option<NetworkInfo> {
-          let base_root_path = match root {
-              &Some(ref path) => PathBuf::from(path),
-              &None => PathBuf::from("/"),
-          };
-          let root_path = base_root_path.join("mnt/config").join(data_path);
+        let base_root_path = match root {
+            &Some(ref path) => PathBuf::from(path),
+            &None => PathBuf::from("/"),
+        };
+        let root_path = base_root_path.join("mnt/config").join(data_path);
         let display = root_path.display();
-        // Needs to be mutable because reading from it apparently involves change
+
+        // Needs to be mutable because reading from it involves change
         let mut file = match File::open(&root_path) {
             Err(why) => {
-                debug!("couldn't open {}: {}", display, Error::description(&why));
+                debug!("couldn't open {}: {}", display,
+                       Error::description(&why));
                 return None;
             },
             Ok(file) => file,
@@ -114,31 +121,31 @@ impl NetworkInfo {
 
         let mut s = String::new();
         match file.read_to_string(&mut s) {
-            Err(why) => panic!(
-                "couldn't read {}: {}", display, Error::description(&why)),
-            Ok(ret) => ret
+            Err(why) => {
+                debug!("couldn't read {}: {}", display,
+                       Error::description(&why));
+                return None;
+            },
+            Ok(ret) => ret,
         };
 
-        if data_path.file_name().unwrap() == "vendor_data.json" {
-            let data: VendorData = match json::decode(&s) {
-                Err(why) => {
-                    debug!("Could not decode {}: {}",
-                           display, Error::description(&why));
-                    return None;
-                },
-                Ok(data) => data
-            };
-            let netinfo = data.network_info;
-            return Some(netinfo);
-        } else if data_path.file_name().unwrap() == "network_info.json" {
-            let data: NetworkInfo = match json::decode(&s) {
-                Err(why) => panic!(
-                    "Could not decode {}: {}", display, Error::description(&why)),
-                Ok(data) => data
-            };
-            return Some(data);
-        }
-        return None;
+        // First, try decoding at NetworkInfo
+        match json::decode::<NetworkInfo>(&s) {
+            Err(why) => {
+                debug!("Could not decode as NetworkInfo {}: {}",
+                       display, Error::description(&why));
+            },
+            Ok(data) => return Some(data),
+        };
+        // Then as VendorData
+        match json::decode::<VendorData>(&s) {
+            Err(why) => {
+                debug!("Could not decode as VendorData {}: {}",
+                       display, Error::description(&why));
+                return None;
+            },
+            Ok(data) => return Some(data.network_info),
+        };
     }
 
     pub fn get_interface_map(&self) -> HashMap<String, Network> {
@@ -155,9 +162,4 @@ impl NetworkInfo {
         }
         return interfaces;
     }
-}
-
-#[derive(RustcDecodable, Debug)]
-pub struct VendorData {
-    network_info: NetworkInfo,
 }
