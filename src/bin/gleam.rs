@@ -31,21 +31,24 @@ fn main() {
     }
 
     let vendor_data_path = env::current_dir().unwrap().join(
-        Path::new("samples/rax/openstack/latest/vendor_data.json"));
+        Path::new("openstack/latest/vendor_data.json"));
     let vendor_display = vendor_data_path.display();
     println!("{}", vendor_display);
-    let vendor_netinfo = get_network_info(&vendor_data_path);
-    println!("{:?}", vendor_netinfo.unwrap().networks[0]);
+    match get_network_info(&opts.root, &vendor_data_path) {
+        Some(info) => println!("{:?}", get_interface_map(&info)),
+        None => {},
+    };
 
     let network_info_path = env::current_dir().unwrap().join(
-        Path::new("samples/liberty/openstack/latest/network_info.json"));
+        Path::new("openstack/latest/network_info.json"));
     let network_display = network_info_path.display();
     println!("{}", network_display);
-    let netinfo = get_network_info(&network_info_path);
-    let net = netinfo.unwrap();
-    let interfaces = get_interface_map(&net);
+    match get_network_info(&opts.root, &network_info_path) {
+        Some(info) => println!("{:?}", get_interface_map(&info)),
+        None => {},
+    };
+
     let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface);
 
-    println!("{:?}", interfaces);
     println!("{:?}", sys_interfaces);
 }

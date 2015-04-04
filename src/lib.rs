@@ -123,12 +123,19 @@ pub fn get_interface_map(netinfo: &NetworkInfo) -> HashMap<String, &Network> {
     return interfaces;
 }
 
-pub fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
-    let display = data_path.display();
+pub fn get_network_info(root: &Option<String>, data_path: &PathBuf) -> Option<NetworkInfo> {
+      let base_root_path = match root {
+          &Some(ref path) => PathBuf::from(path),
+          &None => PathBuf::from("/"),
+      };
+      let root_path = base_root_path.join("mnt/config").join(data_path);
+    let display = root_path.display();
     // Needs to be mutable because reading from it apparently involves change
-    let mut file = match File::open(&data_path) {
-        Err(why) => panic!(
-            "couldn't open {}: {}", display, Error::description(&why)),
+    let mut file = match File::open(&root_path) {
+        Err(why) => {
+            debug!("couldn't open {}: {}", display, Error::description(&why));
+            return None;
+        },
         Ok(file) => file,
     };
 
