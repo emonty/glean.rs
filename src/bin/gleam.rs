@@ -14,7 +14,7 @@
 // limitations under the License.
 
 extern crate gleam;
-use gleam::config_drive::InterfaceMap;
+use gleam::config_drive::ConfigDrive;
 use gleam::sys::SysInterfaces;
 
 mod options;
@@ -28,9 +28,9 @@ fn main() {
         return;
     }
 
-    let interface_map = InterfaceMap::new(&opts.root);
-    match interface_map {
-        Some(interface) => println!("{:?}", interface.map),
+    let config_drive = ConfigDrive::new(&opts.root);
+    match config_drive {
+        Some(interface) => println!("{:?}", interface.interface_map),
         None => {}
     }
 
