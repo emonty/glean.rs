@@ -15,58 +15,13 @@
 
 use glob::glob;
 use std::path::PathBuf;
-use std::fs::File;
-use std::io::prelude::*;
 
-#[derive(Debug)]
-pub struct Interface {
-    address: String,
-    iface: String,
-}
-
-impl Interface {
-  pub fn new(path: &PathBuf) -> Option<Interface> {
-      let iface = path.as_path().file_name().unwrap();
-      if iface == "lo" {
-          return None;
-      }
-      let mut assign_type_file = match File::open(path.join("addr_assign_type")) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(file) => file,
-      };
-      let newline = '\n';
-      let mut assign_type = String::new();
-      match assign_type_file.read_to_string(&mut assign_type) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(_) => {},
-      };
-      let trimmed_assign_type = assign_type.trim_matches(newline);
-      debug!("Type is: ::{}::", trimmed_assign_type);
-      if trimmed_assign_type != "0" {
-          return None
-      }
-      let mut address_file = match File::open(path.join("address")) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(file) => file,
-      };
-      let mut address = String::new();
-      match address_file.read_to_string(&mut address) {
-        Err(why) => { debug!("{}", why); return None},
-        Ok(_) => {},
-      };
-      let trimmed_address = address.trim_matches(newline);
-      debug!("Address is: ::{}::", trimmed_address);
-      Some(Interface {
-         address: String::from_str(trimmed_address),
-         iface: String::from_str(iface.to_str().unwrap()),
-      })
-  }
-}
+mod interface;
 
 #[derive(Debug)]
 pub struct SysInterfaces {
     root: PathBuf,
-    interfaces: Vec<Interface>,
+    interfaces: Vec<interface::Interface>,
 }
 
 impl SysInterfaces {
@@ -85,14 +40,14 @@ impl SysInterfaces {
   }
 }
 
-fn get_interfaces(root_path: &PathBuf, interface: &Option<String>) -> Vec<Interface> {
+fn get_interfaces(root_path: &PathBuf, interface: &Option<String>) -> Vec<interface::Interface> {
     let interface_paths = match interface {
         &Some(ref iface) => vec![PathBuf::from(iface)],
         &None => read_interfaces(root_path),
     };
     let mut interfaces = Vec::new();
     for path in interface_paths {
-        let interface = Interface::new(&path);
+        let interface = interface::Interface::new(&path);
         match interface {
             None => {}
             Some(iface) => interfaces.push(iface),
