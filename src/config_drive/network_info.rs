@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::PathBuf;
+use std::path::{PathBuf, Display};
 use std::ascii::OwnedAsciiExt;
 
 
@@ -109,43 +109,11 @@ impl NetworkInfo {
         let root_path = base_root_path.join("mnt/config").join(data_path);
         let display = root_path.display();
 
-        // Needs to be mutable because reading from it involves change
-        let mut file = match File::open(&root_path) {
-            Err(why) => {
-                debug!("couldn't open {}: {}", display,
-                       Error::description(&why));
-                return None;
-            },
-            Ok(file) => file,
-        };
-
-        let mut s = String::new();
-        match file.read_to_string(&mut s) {
-            Err(why) => {
-                debug!("couldn't read {}: {}", display,
-                       Error::description(&why));
-                return None;
-            },
-            Ok(ret) => ret,
-        };
-
-        // First, try decoding at NetworkInfo
-        match json::decode::<NetworkInfo>(&s) {
-            Err(why) => {
-                debug!("Could not decode as NetworkInfo {}: {}",
-                       display, Error::description(&why));
-            },
-            Ok(data) => return Some(data),
-        };
-        // Then as VendorData
-        match json::decode::<VendorData>(&s) {
-            Err(why) => {
-                debug!("Could not decode as VendorData {}: {}",
-                       display, Error::description(&why));
-                return None;
-            },
-            Ok(data) => return Some(data.network_info),
-        };
+        let json_string = read_string_from_file(&root_path, &display);
+        match json_string {
+            Some(string) => return network_info_from_string(&string, &display),
+            None => return None,
+        }
     }
 
     pub fn get_interface_map(&self) -> HashMap<String, Network> {
@@ -162,4 +130,47 @@ impl NetworkInfo {
         }
         return interfaces;
     }
+}
+
+fn read_string_from_file(root_path: &PathBuf, display: &Display) -> Option<String> {
+    // Needs to be mutable because reading from it involves change
+    let mut file = match File::open(&root_path) {
+        Err(why) => {
+            debug!("couldn't open {}: {}", display,
+                   Error::description(&why));
+            return None;
+        },
+        Ok(file) => file,
+    };
+
+    let mut s = String::new();
+    match file.read_to_string(&mut s) {
+        Err(why) => {
+            debug!("couldn't read {}: {}", display,
+                   Error::description(&why));
+            return None;
+        },
+        Ok(ret) => ret,
+    };
+    return Some(s);
+}
+
+fn network_info_from_string(json_string: &String, display: &Display) -> Option<NetworkInfo> {
+    // First, try decoding as NetworkInfo
+    match json::decode::<NetworkInfo>(&json_string) {
+        Err(why) => {
+            debug!("Could not decode as NetworkInfo {}: {}",
+                   display, Error::description(&why));
+        },
+        Ok(data) => return Some(data),
+    };
+    // Then as VendorData
+    match json::decode::<VendorData>(&json_string) {
+        Err(why) => {
+            debug!("Could not decode as VendorData {}: {}",
+                   display, Error::description(&why));
+            return None;
+        },
+        Ok(data) => return Some(data.network_info),
+    };
 }

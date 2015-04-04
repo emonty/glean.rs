@@ -23,7 +23,7 @@ pub struct ConfigDrive {
 }
 
 impl ConfigDrive {
-    pub fn new(root: &Option<String>,) -> Option<ConfigDrive> {
+    pub fn new(root: &Option<String>) -> Option<ConfigDrive> {
         let paths = vec![
             "openstack/latest/network_info.json",
             "openstack/latest/vendor_data.json",
@@ -40,4 +40,3 @@ impl ConfigDrive {
         return None;
     }
 }
-
