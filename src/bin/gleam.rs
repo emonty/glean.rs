@@ -14,9 +14,7 @@
 // limitations under the License.
 
 extern crate gleam;
-use std::path::Path;
-use std::env;
-use gleam::{get_network_info, get_interface_map};
+use gleam::InterfaceMap;
 use gleam::sys::SysInterfaces;
 
 mod options;
@@ -30,23 +28,11 @@ fn main() {
         return;
     }
 
-    let vendor_data_path = env::current_dir().unwrap().join(
-        Path::new("openstack/latest/vendor_data.json"));
-    let vendor_display = vendor_data_path.display();
-    println!("{}", vendor_display);
-    match get_network_info(&opts.root, &vendor_data_path) {
-        Some(info) => println!("{:?}", get_interface_map(&info)),
-        None => {},
-    };
-
-    let network_info_path = env::current_dir().unwrap().join(
-        Path::new("openstack/latest/network_info.json"));
-    let network_display = network_info_path.display();
-    println!("{}", network_display);
-    match get_network_info(&opts.root, &network_info_path) {
-        Some(info) => println!("{:?}", get_interface_map(&info)),
-        None => {},
-    };
+    let interface_map = InterfaceMap::new(&opts.root);
+    match interface_map {
+        Some(interface) => println!("{:?}", interface.map),
+        None => {}
+    }
 
     let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface);
 

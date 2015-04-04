@@ -52,14 +52,14 @@ impl Decodable for Service {
 }
 
 
-#[derive(RustcDecodable, Debug)]
+#[derive(RustcDecodable, Debug, Clone)]
 pub struct Route {
     netmask: String,
     network: String,
     gateway: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Network {
     network_id: String,
     network_type: String,
@@ -108,7 +108,29 @@ pub struct VendorData {
     network_info: NetworkInfo,
 }
 
-pub fn get_interface_map(netinfo: &NetworkInfo) -> HashMap<String, &Network> {
+pub struct InterfaceMap {
+    pub map: HashMap<String, Network>,
+}
+
+impl InterfaceMap {
+    pub fn new(root: &Option<String>,) -> Option<InterfaceMap> {
+        let paths = vec![
+            "openstack/latest/network_info.json",
+            "openstack/latest/vendor_data.json",
+            ];
+        for path in paths {
+            let data_path = PathBuf::from(path);
+            println!("Trying Path: {}", path);
+            match get_network_info(root, &data_path) {
+                Some(info) => return Some(InterfaceMap{ map: get_interface_map(&info) }),
+                None => {},
+            };
+        }
+        return None;
+    }
+}
+
+pub fn get_interface_map(netinfo: &NetworkInfo) -> HashMap<String, Network> {
 
     let mut interfaces = HashMap::new();
     for link in netinfo.links.iter() {
@@ -116,7 +138,7 @@ pub fn get_interface_map(netinfo: &NetworkInfo) -> HashMap<String, &Network> {
             if net.link == link.id {
                 let mac_addr = String::from_str(&link.ethernet_mac_address);
                 let lower_mac = mac_addr.into_ascii_lowercase();
-                interfaces.insert(lower_mac, net);
+                interfaces.insert(lower_mac, net.clone());
             }
         }
     }
