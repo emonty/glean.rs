@@ -16,6 +16,8 @@
 #![feature(std_misc)]
 #![feature(collections)]
 #![feature(custom_derive)]
+#[macro_use]
+extern crate log;
 extern crate glob;
 extern crate rustc_serialize;
 use rustc_serialize::{json, Decodable, Decoder};
@@ -26,7 +28,7 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 use std::ascii::OwnedAsciiExt;
 
-mod sys;
+pub mod sys;
 
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them

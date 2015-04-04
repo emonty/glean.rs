@@ -17,7 +17,6 @@ use glob::glob;
 use std::path::PathBuf;
 use std::fs::File;
 use std::io::prelude::*;
-use std::env;
 
 #[derive(Debug)]
 pub struct Interface {
@@ -32,60 +31,64 @@ impl Interface {
           return None;
       }
       let mut assign_type_file = match File::open(path.join("addr_assign_type")) {
-        Err(why) => return None,
+        Err(why) => { debug!("{}", why); return None},
         Ok(file) => file,
       };
+      let newline = '\n';
       let mut assign_type = String::new();
-      assign_type_file.read_to_string(&mut assign_type);
-      println!("Type is: ::{}::", assign_type);
-      if assign_type != "0" {
+      match assign_type_file.read_to_string(&mut assign_type) {
+        Err(why) => { debug!("{}", why); return None},
+        Ok(_) => {},
+      };
+      let trimmed_assign_type = assign_type.trim_matches(newline);
+      debug!("Type is: ::{}::", trimmed_assign_type);
+      if trimmed_assign_type != "0" {
           return None
       }
       let mut address_file = match File::open(path.join("address")) {
-        Err(why) => return None,
+        Err(why) => { debug!("{}", why); return None},
         Ok(file) => file,
       };
       let mut address = String::new();
-      address_file.read_to_string(&mut address);
+      match address_file.read_to_string(&mut address) {
+        Err(why) => { debug!("{}", why); return None},
+        Ok(_) => {},
+      };
+      let trimmed_address = address.trim_matches(newline);
+      debug!("Address is: ::{}::", trimmed_address);
       Some(Interface {
-         address: address,
+         address: String::from_str(trimmed_address),
          iface: String::from_str(iface.to_str().unwrap()),
       })
   }
 }
 
+#[derive(Debug)]
 pub struct SysInterfaces {
     root: PathBuf,
     interfaces: Vec<Interface>,
 }
 
 impl SysInterfaces {
-  pub fn new(root: Option<&String>, interface: Option<&String>) -> SysInterfaces {
-      let root_path = match root {
-          Some(path) => expand_root_path(PathBuf::from(path)),
-          None => env::current_dir().unwrap(),
+  pub fn new(root: &Option<String>, interface: &Option<String>) -> SysInterfaces {
+
+      let base_root_path = match root {
+          &Some(ref path) => PathBuf::from(path),
+          &None => PathBuf::from("/"),
       };
+      let root_path = base_root_path.join("sys/class/net");
+      debug!("Root Path {:?}", root_path);
       SysInterfaces {
-          root: PathBuf::from(root_path.to_str().unwrap()),
-          interfaces: get_interfaces(root_path, interface),
+          root: PathBuf::from(&root_path),
+          interfaces: get_interfaces(&root_path, interface),
       }
   }
-
 }
 
-fn expand_root_path(root_path: PathBuf) -> PathBuf {
-    let sys_root = PathBuf::from("/sys/class/net");
-    let new_path = match root_path.as_path().to_str().unwrap() {
-        "/mnt/config" => sys_root,
-        _ => root_path.join(sys_root),
-    };
-    return new_path;
-}
-
-fn get_interfaces(root_path: PathBuf, interface: Option<&String>) -> Vec<Interface> {
+fn get_interfaces(root_path: &PathBuf, interface: &Option<String>) -> Vec<Interface> {
     let interface_paths = match interface {
-        Some(iface) => vec![PathBuf::from(iface)],
-        None => read_interfaces(root_path),
+        &Some(ref iface) => vec![PathBuf::from(iface)],
+        &None => read_interfaces(root_path),
     };
     let mut interfaces = Vec::new();
     for path in interface_paths {
@@ -98,7 +101,7 @@ fn get_interfaces(root_path: PathBuf, interface: Option<&String>) -> Vec<Interfa
     return interfaces;
 }
 
-fn read_interfaces(root_path: PathBuf) -> Vec<PathBuf> {
+fn read_interfaces(root_path: &PathBuf) -> Vec<PathBuf> {
    let mut interfaces = Vec::new();
    let root_glob_path = root_path.join("*");
    let glob_path = root_glob_path.to_str().unwrap();

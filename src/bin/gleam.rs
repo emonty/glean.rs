@@ -17,13 +17,14 @@ extern crate gleam;
 use std::path::Path;
 use std::env;
 use gleam::{get_network_info, get_interface_map};
+use gleam::sys::SysInterfaces;
 
 mod options;
 
 #[cfg(not(test))]
 fn main() {
 
-    let opts = options::get_options();
+    let opts = options::Opt::new();
     if opts.help {
         println!("{}", opts.usage);
         return;
@@ -43,6 +44,8 @@ fn main() {
     let netinfo = get_network_info(&network_info_path);
     let net = netinfo.unwrap();
     let interfaces = get_interface_map(&net);
+    let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface);
 
     println!("{:?}", interfaces);
+    println!("{:?}", sys_interfaces);
 }

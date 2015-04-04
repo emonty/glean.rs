@@ -21,40 +21,42 @@ use std::env;
 pub struct Opt {
   pub help: bool,
   pub noop: bool,
-  pub root: String,
+  pub root: Option<String>,
   pub distro: Option<String>,
   pub interface: Option<String>,
   pub usage: String,
 }
 
-pub fn get_options() -> Opt {
-    let args: Vec<String> = env::args().collect();
-    let program = args[0].clone();
+impl Opt {
+    pub fn new() -> Opt {
+        let args: Vec<String> = env::args().collect();
+        let program = args[0].clone();
 
-    let mut opts = Options::new();
+        let mut opts = Options::new();
 
-    opts.optflag("h", "help", "print this help menu");
-    opts.optflag("n", "noop", "Do not write files");
-    opts.optopt("", "root", "Mounted root for config drive info [default: '/mnt/config']", "ROOT");
-    opts.optopt("", "distro", "Override detected distro", "DISTRO");
-    opts.optopt("i", "interface", "Interface to process", "INTERFACE");
+        opts.optflag("h", "help", "print this help menu");
+        opts.optflag("n", "noop", "Do not write files");
+        opts.optopt("", "root", "Mounted root for config drive info [default: '/mnt/config']", "ROOT");
+        opts.optopt("", "distro", "Override detected distro", "DISTRO");
+        opts.optopt("i", "interface", "Interface to process", "INTERFACE");
 
-    let matches = match opts.parse(&args[1..]) {
-        Ok(m) => { m }
-        Err(f) => { panic!(f.to_string()) }
-    };
-    let brief = format!("Usage: {} [options]", program);
-    let ret = Opt {
-        usage: opts.usage(&brief),
-        help: matches.opt_present("help"),
-        noop: matches.opt_present("noop"),
-        root: match matches.opt_present("root") {
-            true => matches.opt_str("root").unwrap(),
-            false => "/mnt/config".to_string(),
-        },
-        distro: None,
-        interface: None,
-    };
+        let matches = match opts.parse(&args[1..]) {
+            Ok(m) => { m }
+            Err(f) => { panic!(f.to_string()) }
+        };
+        let brief = format!("Usage: {} [options]", program);
+        let ret = Opt {
+            usage: opts.usage(&brief),
+            help: matches.opt_present("help"),
+            noop: matches.opt_present("noop"),
+            root: match matches.opt_present("root") {
+                true => matches.opt_str("root"),
+                false => None,
+            },
+            distro: matches.opt_str("distro"),
+            interface: matches.opt_str("interface"),
+        };
 
-    return ret;
+        return ret;
+    }
 }
