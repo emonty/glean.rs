@@ -14,13 +14,19 @@
 // limitations under the License.
 
 extern crate gleam;
-use gleam::Service;
+use gleam::config_drive::ConfigDrive;
+use std::string::ToString;
 
 #[test]
 fn it_works() {
 
-    let foo = Service {
-        service_type: "foo".to_string(),
-        address: "foo".to_string(),
-    };
+    let root = "samples/liberty";
+    let config_drive = ConfigDrive::new(&Some(ToString::to_string(root)));
+    match config_drive {
+        Some(interface) => {
+            println!("Network {:?}", interface.interface_map);
+            println!("DNS {:?}", interface.dns);
+        },
+        None => assert!(false),
+    }
 }
