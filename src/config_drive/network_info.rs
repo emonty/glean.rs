@@ -121,8 +121,11 @@ impl NetworkInfo {
 
         if data_path.file_name().unwrap() == "vendor_data.json" {
             let data: VendorData = match json::decode(&s) {
-                Err(why) => panic!(
-                    "Could not decode {}: {}", display, Error::description(&why)),
+                Err(why) => {
+                    debug!("Could not decode {}: {}",
+                           display, Error::description(&why));
+                    return None;
+                },
                 Ok(data) => data
             };
             let netinfo = data.network_info;
