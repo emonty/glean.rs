@@ -89,10 +89,14 @@ fn is_interface_live(path: &PathBuf, noop: bool) -> bool {
       loop {
           match range.next() {
               Some(x) => {
-                  debug!("ip link number {}", x);
-                  let output = Command::new("ip")
+                  debug!("ip link {:?} number {}", iface, x);
+                  match Command::new("ip")
                       .arg("link").arg("set").arg("dev").arg(iface).arg("up")
-                      .status();
+                      .output() {
+                    Err(why) => debug!("ip link set error: {}", why),
+                    _ => {},
+                  };
+
                   match get_file_value(&path.join("carrier")) {
                     None => {}
                     Some(value) => {
