@@ -16,6 +16,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
+use std::process::Command;
 
 #[derive(Debug)]
 pub struct Interface {
@@ -37,16 +38,9 @@ impl Interface {
           return None
       }
 
-      // Check to see if it's a live interface
-      let carrier = match get_file_value(&path.join("carrier")) {
-        None => return None,
-        Some(value) => value,
-      };
-      if carrier != "1" {
+      if ! is_interface_live(&path, noop) {
           return None
       }
-      // This will be there so do things with ip link set dev {} up
-      if noop { }
 
       let address = match get_file_value(&path.join("address")) {
         None => return None,
@@ -74,4 +68,42 @@ fn get_file_value(path: &PathBuf) -> Option<String> {
   let value = raw_value.trim_matches(newline);
   debug!("File {} value is: ::{}::", path.display(), value);
   return Some(String::from_str(value));
+}
+
+fn is_interface_live(path: &PathBuf, noop: bool) -> bool {
+  // Check to see if it's a live interface
+  match get_file_value(&path.join("carrier")) {
+    None => {}
+    Some(value) => {
+        if value == "1" {
+            return true;
+        }
+    },
+  };
+  // This will be there so do things with ip link set dev {} up
+  if noop {
+      return false;
+  } else {
+      let iface = path.as_path().file_name().unwrap();
+      let mut range = 0..10;
+      loop {
+          match range.next() {
+              Some(x) => {
+                  debug!("ip link number {}", x);
+                  let output = Command::new("ip")
+                      .arg("link").arg("set").arg("dev").arg(iface).arg("up")
+                      .status();
+                  match get_file_value(&path.join("carrier")) {
+                    None => {}
+                    Some(value) => {
+                        if value == "1" {
+                            return true;
+                        }
+                    },
+                  };
+              },
+              None => return false,
+          }
+      }
+  }
 }
