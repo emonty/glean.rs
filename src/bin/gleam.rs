@@ -16,7 +16,7 @@
 extern crate gleam;
 use std::path::Path;
 use std::env;
-use gleam::get_network_info;
+use gleam::{get_network_info, get_interface_map};
 
 mod options;
 
@@ -41,6 +41,8 @@ fn main() {
     let network_display = network_info_path.display();
     println!("{}", network_display);
     let netinfo = get_network_info(&network_info_path);
+    let net = netinfo.unwrap();
+    let interfaces = get_interface_map(&net);
 
-    println!("{:?}", netinfo.unwrap().networks[0]);
+    println!("{:?}", interfaces);
 }

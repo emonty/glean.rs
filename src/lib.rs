@@ -13,13 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![feature(std_misc)]
+#![feature(collections)]
 #![feature(custom_derive)]
 extern crate rustc_serialize;
 use rustc_serialize::{json, Decodable, Decoder};
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
+use std::ascii::OwnedAsciiExt;
 
 // Automatically generate `Decodable` trait implementations
 // Don't generate `Encodable` because we don't use them
@@ -61,6 +65,7 @@ pub struct Network {
     id: String,
 }
 
+
 // Custom class because type can't be a struct member
 impl Decodable for Network {
   fn decode<D: Decoder>(decoder: &mut D) -> Result<Network, D::Error> {
@@ -96,6 +101,21 @@ pub struct NetworkInfo {
 #[derive(RustcDecodable, Debug)]
 pub struct VendorData {
     network_info: NetworkInfo,
+}
+
+pub fn get_interface_map(netinfo: &NetworkInfo) -> HashMap<String, &Network> {
+
+    let mut interfaces = HashMap::new();
+    for link in netinfo.links.iter() {
+        for net in netinfo.networks.iter() {
+            if net.link == link.id {
+                let mac_addr = String::from_str(&link.ethernet_mac_address);
+                let lower_mac = mac_addr.into_ascii_lowercase();
+                interfaces.insert(lower_mac, net);
+            }
+        }
+    }
+    return interfaces;
 }
 
 pub fn get_network_info(data_path: &PathBuf) -> Option<NetworkInfo> {
