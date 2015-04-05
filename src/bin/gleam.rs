@@ -16,6 +16,7 @@
 extern crate gleam;
 use gleam::config_drive::ConfigDrive;
 use gleam::sys::SysInterfaces;
+use gleam::net_writer::NetworkWriter;
 
 mod options;
 
@@ -30,7 +31,7 @@ fn main() {
 
     let config_drive = ConfigDrive::new(&opts.root);
     match config_drive {
-        Some(interface) => {
+        Some(ref interface) => {
             println!("Network {:?}", interface.interface_map);
             println!("DNS {:?}", interface.dns);
         },
@@ -38,6 +39,8 @@ fn main() {
     }
 
     let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface, opts.noop);
+
+    let writer = NetworkWriter::new(&opts.root, &sys_interfaces, config_drive, opts.noop);
 
     println!("{:?}", sys_interfaces);
 }

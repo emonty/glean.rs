@@ -18,7 +18,7 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::Command;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Interface {
     address: String,
     iface: String,

@@ -18,7 +18,7 @@ use std::path::PathBuf;
 
 mod interface;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SysInterfaces {
     root: PathBuf,
     interfaces: Vec<interface::Interface>,

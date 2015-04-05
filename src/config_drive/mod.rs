@@ -18,6 +18,7 @@ use std::path::PathBuf;
 
 mod network_info;
 
+#[derive(Debug, Clone)]
 pub struct ConfigDrive {
     pub interface_map: HashMap<String, network_info::Network>,
     pub dns: Vec<String>,
