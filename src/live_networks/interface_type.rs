@@ -37,31 +37,11 @@ impl PartialOrd for InterfaceType {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         return self.get_key().partial_cmp(&other.get_key());
     }
-
-    fn lt(&self, other: &Self) -> bool {
-        return self.get_key().lt(&other.get_key());
-    }
-
-    fn le(&self, other: &Self) -> bool {
-        return self.get_key().le(&other.get_key());
-    }
-
-    fn gt(&self, other: &Self) -> bool {
-        return self.get_key().gt(&other.get_key());
-    }
-
-    fn ge(&self, other: &Self) -> bool {
-        return self.get_key().ge(&other.get_key());
-    }
 }
 
 impl PartialEq for InterfaceType {
     fn eq(&self, other: &Self) -> bool {
         return self.get_key().eq(&other.get_key());
-    }
-
-    fn ne(&self, other: &Self) -> bool {
-        return self.get_key().ne(&other.get_key());
     }
 }
 
