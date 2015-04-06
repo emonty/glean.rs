@@ -16,7 +16,7 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-mod network_info;
+pub mod network_info;
 
 #[derive(Debug, Clone)]
 pub struct ConfigDrive {

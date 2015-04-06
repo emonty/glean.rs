@@ -59,7 +59,7 @@ pub struct Network {
     link: String,
     routes: Vec<Route>,
     ip_address: String,
-    id: String,
+    pub id: String,
 }
 
 

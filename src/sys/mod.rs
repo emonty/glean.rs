@@ -21,7 +21,7 @@ mod interface;
 #[derive(Debug, Clone)]
 pub struct SysInterfaces {
     root: PathBuf,
-    interfaces: Vec<interface::Interface>,
+    pub interfaces: Vec<interface::Interface>,
 }
 
 impl SysInterfaces {

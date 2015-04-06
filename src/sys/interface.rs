@@ -20,8 +20,8 @@ use std::process::Command;
 
 #[derive(Debug, Clone)]
 pub struct Interface {
-    address: String,
-    iface: String,
+    pub address: String,
+    pub iface: String,
 }
 
 impl Interface {
