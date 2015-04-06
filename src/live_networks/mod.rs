@@ -17,6 +17,7 @@ pub use super::config_drive::ConfigDrive;
 pub use super::config_drive::network_info::Network;
 pub use super::sys::SysInterfaces;
 pub use self::interface_type::InterfaceType;
+pub use self::interface_type::InterfaceType::{Static, Dhcp};
 
 mod interface_type;
 
@@ -37,11 +38,11 @@ impl LiveNetworks {
                       Some(network) => {
                           let mut new_net = network.clone();
                           new_net.id = iface.iface.clone();
-                          live_ifaces.push(InterfaceType::Static(new_net));
+                          live_ifaces.push(Static(new_net));
                       },
-                      None => live_ifaces.push(InterfaceType::Dhcp(iface.iface.clone())),
+                      None => live_ifaces.push(Dhcp(iface.iface.clone())),
                   },
-              None => live_ifaces.push(InterfaceType::Dhcp(iface.iface.clone())),
+              None => live_ifaces.push(Dhcp(iface.iface.clone())),
           }
       }
       live_ifaces.sort();

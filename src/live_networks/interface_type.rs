@@ -16,6 +16,7 @@
 use std::cmp::Ordering;
 
 pub use ::config_drive::network_info::Network;
+pub use self::InterfaceType::{Static, Dhcp};
 
 #[derive(Debug)]
 pub enum InterfaceType {
@@ -26,8 +27,8 @@ pub enum InterfaceType {
 impl InterfaceType {
     fn get_key(&self) -> String {
         match *self {
-            InterfaceType::Static(ref network) => return network.id.clone(),
-            InterfaceType::Dhcp(ref network) => return network.clone(),
+            Static(ref network) => return network.id.clone(),
+            Dhcp(ref network) => return network.clone(),
         }
     }
 }
