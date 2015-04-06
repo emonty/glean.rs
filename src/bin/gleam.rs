@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[macro_use]
+extern crate log;
 extern crate gleam;
 use gleam::config_drive::ConfigDrive;
 use gleam::sys::SysInterfaces;
@@ -32,8 +34,8 @@ fn main() {
     let config_drive = ConfigDrive::new(&opts.root);
     match config_drive {
         Some(ref interface) => {
-            println!("Network {:?}", interface.interface_map);
-            println!("DNS {:?}", interface.dns);
+            debug!("Network {:?}", interface.interface_map);
+            debug!("DNS {:?}", interface.dns);
         },
         None => {}
     }
