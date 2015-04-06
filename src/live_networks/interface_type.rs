@@ -15,8 +15,8 @@
 
 use std::cmp::Ordering;
 
-pub use ::config_drive::network_info::Network;
-pub use self::InterfaceType::{Static, Dhcp};
+use ::config_drive::network_info::Network;
+use self::InterfaceType::{Static, Dhcp};
 
 #[derive(Debug)]
 pub enum InterfaceType {

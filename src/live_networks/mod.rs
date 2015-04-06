@@ -13,11 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub use super::config_drive::ConfigDrive;
-pub use super::config_drive::network_info::Network;
-pub use super::sys::SysInterfaces;
-pub use self::interface_type::InterfaceType;
-pub use self::interface_type::InterfaceType::{Static, Dhcp};
+use ::config_drive::ConfigDrive;
+use ::sys::SysInterfaces;
+use self::interface_type::InterfaceType;
+use self::interface_type::InterfaceType::{Static, Dhcp};
 
 mod interface_type;
 
