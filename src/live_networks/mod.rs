@@ -13,66 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::cmp::Ordering;
-
 pub use super::config_drive::ConfigDrive;
-pub use super::sys::SysInterfaces;
 pub use super::config_drive::network_info::Network;
+pub use super::sys::SysInterfaces;
+pub use self::interface_type::InterfaceType;
 
-#[derive(Debug)]
-pub enum InterfaceType {
-    Static(Network),
-    Dhcp(String),
-}
-
-impl InterfaceType {
-    fn get_key(&self) -> String {
-        match *self {
-            InterfaceType::Static(ref network) => return network.id.clone(),
-            InterfaceType::Dhcp(ref network) => return network.clone(),
-        }
-    }
-}
-
-impl PartialOrd for InterfaceType {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        return self.get_key().partial_cmp(&other.get_key());
-    }
-
-    fn lt(&self, other: &Self) -> bool {
-        return self.get_key().lt(&other.get_key());
-    }
-
-    fn le(&self, other: &Self) -> bool {
-        return self.get_key().le(&other.get_key());
-    }
-
-    fn gt(&self, other: &Self) -> bool {
-        return self.get_key().gt(&other.get_key());
-    }
-
-    fn ge(&self, other: &Self) -> bool {
-        return self.get_key().ge(&other.get_key());
-    }
-}
-
-impl PartialEq for InterfaceType {
-    fn eq(&self, other: &Self) -> bool {
-        return self.get_key().eq(&other.get_key());
-    }
-
-    fn ne(&self, other: &Self) -> bool {
-        return self.get_key().ne(&other.get_key());
-    }
-}
-
-impl Eq for InterfaceType {}
-
-impl Ord for InterfaceType {
-    fn cmp(&self, other: &Self) -> Ordering {
-        return self.get_key().cmp(&other.get_key());
-    }
-}
+mod interface_type;
 
 #[derive(Debug)]
 pub struct LiveNetworks {
