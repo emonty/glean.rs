@@ -13,8 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::Path;
+use std::path::{Path,PathBuf};
 use std::fs::PathExt;
+use std::process::Command;
 
 use ::config_drive::ConfigDrive;
 use ::sys::SysInterfaces;
@@ -64,7 +65,7 @@ impl LiveNetworks {
     }
 
     pub fn get_output(&self) -> FileList {
-        let files = match self.platform {
+        match self.platform {
             RedHat => {
                 let w = RedHatWriter;
                 return get_output_files(&w as &Writer, &self.interfaces);
@@ -85,7 +86,10 @@ fn get_output_files(writer: &Writer, interfaces: &Vec<InterfaceType>) -> FileLis
             &Dhcp(ref iface) => iface.clone(),
         };
         if ! writer.config_exists(&iface) {
+            println!("Don't have: {}", iface);
             file_list.push(writer.generate_config(&interface));
+        } else {
+            println!("Already have: {}", iface);
         }
     }
     FileList { files: file_list }
@@ -125,8 +129,12 @@ trait Writer {
 
 impl Writer for RedHatWriter {
     fn config_exists(&self, iface: &String) -> bool {
-        return true;
+      // TODO plumb root positioning in here
+      let path_str = String::from(format!("/etc/sysconfig/network-scripts/ifcfg-{}", iface));
+      let path_buf = PathBuf::from(&path_str);
+      return path_buf.as_path().is_file();
     }
+
     fn generate_config(&self, interface: &InterfaceType) -> FileToWrite {
         return FileToWrite { filename: String::from(""), content: String::from("") };
     }
@@ -134,7 +142,10 @@ impl Writer for RedHatWriter {
 
 impl Writer for DebianWriter {
     fn config_exists(&self, iface: &String) -> bool {
-        return true;
+      match Command::new("ifquery").arg(iface).status() {
+        Err(why) => { debug!("ifquery error: {}", why); return false ; }
+        Ok(status) => return status.success(),
+      }
     }
     fn generate_config(&self, interface: &InterfaceType) -> FileToWrite {
         return FileToWrite { filename: String::from(""), content: String::from("") };
