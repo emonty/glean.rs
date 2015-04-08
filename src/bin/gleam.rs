@@ -43,5 +43,5 @@ fn main() {
     let sys_interfaces = SysInterfaces::new(&opts.root, &opts.interface, opts.noop);
 
     let live_networks = LiveNetworks::new(&sys_interfaces, config_drive);
-    println!("{:?}", live_networks);
+    println!("{:?}", live_networks.get_output());
 }

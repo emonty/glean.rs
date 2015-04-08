@@ -13,16 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::path::Path;
+use std::fs::PathExt;
+
 use ::config_drive::ConfigDrive;
 use ::sys::SysInterfaces;
 use self::interface_type::InterfaceType;
 use self::interface_type::InterfaceType::{Static, Dhcp};
+use self::Platform::{RedHat, Debian};
 
 mod interface_type;
 
 #[derive(Debug)]
 pub struct LiveNetworks {
     interfaces: Vec<InterfaceType>,
+    platform: Platform,
 }
 
 impl LiveNetworks {
@@ -46,9 +51,93 @@ impl LiveNetworks {
       }
       live_ifaces.sort();
 
-
+      let platform;
+      if Path::new("/etc/network").is_dir() {
+          platform = RedHat;
+      } else {
+          platform = Debian;
+      }
       LiveNetworks {
           interfaces: live_ifaces,
+          platform: platform,
       }
     }
+
+    pub fn get_output(&self) -> FileList {
+        let files = match self.platform {
+            RedHat => {
+                let w = RedHatWriter;
+                return get_output_files(&w as &Writer, &self.interfaces);
+            }
+            Debian => {
+                let w = DebianWriter;
+                return get_output_files(&w as &Writer, &self.interfaces);
+            }
+        };
+    }
 }
+
+fn get_output_files(writer: &Writer, interfaces: &Vec<InterfaceType>) -> FileList {
+    let mut file_list = Vec::<FileToWrite>::new();
+    for interface in interfaces.iter() {
+        let iface = match(interface) {
+            &Static(ref network) => network.id.clone(),
+            &Dhcp(ref iface) => iface.clone(),
+        };
+        if ! writer.config_exists(&iface) {
+            file_list.push(writer.generate_config(&interface));
+        }
+    }
+    FileList { files: file_list }
+}
+
+#[derive(Debug)]
+pub struct FileList {
+   files: Vec<FileToWrite>,
+}
+
+impl FileList {
+   pub fn write(&self) {
+      println!("{:?}", self.files);
+   }
+}
+
+
+#[derive(Debug)]
+struct FileToWrite {
+    filename: String,
+    content: String,
+}
+
+#[derive(Debug)]
+enum Platform {
+  RedHat,
+  Debian,
+}
+
+struct RedHatWriter;
+struct DebianWriter;
+
+trait Writer {
+    fn config_exists(&self, iface: &String) -> bool;
+    fn generate_config(&self, interface: &InterfaceType) -> FileToWrite;
+}
+
+impl Writer for RedHatWriter {
+    fn config_exists(&self, iface: &String) -> bool {
+        return true;
+    }
+    fn generate_config(&self, interface: &InterfaceType) -> FileToWrite {
+        return FileToWrite { filename: String::from(""), content: String::from("") };
+    }
+}
+
+impl Writer for DebianWriter {
+    fn config_exists(&self, iface: &String) -> bool {
+        return true;
+    }
+    fn generate_config(&self, interface: &InterfaceType) -> FileToWrite {
+        return FileToWrite { filename: String::from(""), content: String::from("") };
+    }
+}
+
