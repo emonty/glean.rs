@@ -54,11 +54,11 @@ pub struct Route {
 #[derive(Debug, Clone)]
 pub struct Network {
     network_id: String,
-    network_type: String,
-    netmask: String,
+    pub network_type: String,
+    pub netmask: String,
     link: String,
-    routes: Vec<Route>,
-    ip_address: String,
+    pub routes: Vec<Route>,
+    pub ip_address: String,
     pub id: String,
 }
 
