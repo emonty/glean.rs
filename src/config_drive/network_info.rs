@@ -19,7 +19,6 @@ use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::{PathBuf, Display};
-use std::ascii::OwnedAsciiExt;
 
 
 // Automatically generate `Decodable` trait implementations
@@ -122,8 +121,7 @@ impl NetworkInfo {
         for link in self.links.iter() {
             for net in self.networks.iter() {
                 if net.link == link.id {
-                    let mac_addr = String::from_str(&link.ethernet_mac_address);
-                    let lower_mac = mac_addr.into_ascii_lowercase();
+                    let lower_mac = link.ethernet_mac_address.chars().flat_map(char::to_lowercase).collect::<String>();
                     interfaces.insert(lower_mac, net.clone());
                 }
             }
