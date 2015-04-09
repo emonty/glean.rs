@@ -55,7 +55,7 @@ pub struct Network {
     network_id: String,
     pub network_type: String,
     pub netmask: String,
-    link: String,
+    pub link: String,
     pub routes: Vec<Route>,
     pub ip_address: String,
     pub id: String,
