@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::{Path,PathBuf};
-use std::fs::PathExt;
+use std::path::PathBuf;
+use std::fs;
 use std::process::Command;
 
 use ::config_drive::ConfigDrive;
@@ -53,11 +53,18 @@ impl LiveNetworks {
       live_ifaces.sort();
 
       let platform;
-      if Path::new("/etc/network").is_dir() {
-          platform = Debian;
-      } else {
-          platform = RedHat;
-      }
+      match fs::metadata("/etc/network") {
+          Ok(metadata) => {
+              if metadata.is_dir() {
+                  platform = Debian;
+              } else {
+                  platform = RedHat;
+              }
+          },
+          Err(_) => {
+              platform = RedHat;
+          },
+      };
       LiveNetworks {
           interfaces: live_ifaces,
           platform: platform,
@@ -131,9 +138,12 @@ trait Writer {
 impl Writer for RedHatWriter {
     fn config_exists(&self, iface: &String) -> bool {
       // TODO plumb root positioning in here
-      let path_str = String::from(format!("/etc/sysconfig/network-scripts/ifcfg-{}", iface));
-      let path_buf = PathBuf::from(&path_str);
-      return path_buf.as_path().is_file();
+      let mut path_str = String::from("/etc/sysconfig/network-scripts/ifcfg-");
+      path_str.push_str(iface);
+      match fs::metadata(path_str) {
+          Ok(metadata) => return metadata.is_file(),
+          Err(_) => return false,
+      }
     }
 
     fn generate_config(&self, iface: &String, interface: &InterfaceType) -> FileToWrite {

@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #![feature(std_misc)]
-#![feature(path_ext)]
 #![feature(collections)]
 #![feature(custom_derive)]
 #[macro_use]
