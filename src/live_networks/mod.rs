@@ -205,7 +205,7 @@ impl Writer for DebianWriter {
       }
     }
     fn generate_config(&self, iface: &String, interface: &InterfaceType) -> FileToWrite {
-        let content;
+        let mut content;
         match interface {
             &Dhcp(_) => { content = format!("# {bullet}
 aut0 {iface}
@@ -217,11 +217,27 @@ iface {iface} inet dhcp", bullet=BULLET, iface=iface) },
                 } else {
                     link_type = "inet";
                 }
-                content = format!("# {bullet}
+                content = String::from(format!("# {bullet}
 aut0 {iface}
 iface {iface} {link_type} static
     address {ip_address}
-    netmask {netmask}", bullet=BULLET, iface=iface, link_type=link_type, ip_address=network.ip_address, netmask=network.netmask);
+    netmask {netmask}", bullet=BULLET, iface=iface, link_type=link_type, ip_address=network.ip_address, netmask=network.netmask));
+                for ref route in network.routes {
+                    if route.network == "0.0.0.0" && route.netmask == "0.0.0.0" {
+                        content.push_str(&format!("
+    gateway {gateway}", gateway=route.gateway));
+                    } else {
+                        content.push_str(&format!("
+    post-up route add -net {net} netmask {mask} gw {gw} || true\n",
+                            net=route.network, mask=route.netmask,
+                            gw=route.gateway));
+                        content.push_str(&format!("
+    pre-down route add -net {net} netmask {mask} gw {gw} || true\n",
+                            net=route.network, mask=route.netmask,
+                            gw=route.gateway));
+                    }
+                }
+
             }
         };
 

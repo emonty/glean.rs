@@ -45,9 +45,9 @@ impl Decodable for Service {
 
 #[derive(RustcDecodable, Debug, Clone)]
 pub struct Route {
-    netmask: String,
-    network: String,
-    gateway: String,
+    pub netmask: String,
+    pub network: String,
+    pub gateway: String,
 }
 
 #[derive(Debug, Clone)]
