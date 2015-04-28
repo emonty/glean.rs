@@ -1,5 +1,5 @@
 =====
-gleam
+glean
 =====
 Basic network and system configuration that can't be done until boot
 
@@ -27,5 +27,5 @@ network config via `config-drive`.
 
 SSH Keypairs
 ------------
-Finally, `gleam` will handle ssh-keypair-injection from config
+Finally, `glean` will handle ssh-keypair-injection from config
 drive if cloud-init is not installed.

@@ -15,10 +15,10 @@
 
 #[macro_use]
 extern crate log;
-extern crate gleam;
-use gleam::config_drive::ConfigDrive;
-use gleam::sys::SysInterfaces;
-use gleam::live_networks::LiveNetworks;
+extern crate glean;
+use glean::config_drive::ConfigDrive;
+use glean::sys::SysInterfaces;
+use glean::live_networks::LiveNetworks;
 
 mod options;
 

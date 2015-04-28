@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-extern crate gleam;
-use gleam::config_drive::ConfigDrive;
+extern crate glean;
+use glean::config_drive::ConfigDrive;
 use std::string::ToString;
 
 #[test]
