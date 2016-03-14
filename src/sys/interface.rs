@@ -17,6 +17,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
 use std::process::Command;
+use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 pub struct Interface {
@@ -49,7 +50,7 @@ impl Interface {
 
       Some(Interface {
          address: address,
-         iface: String::from_str(iface.to_str().unwrap()),
+         iface: String::from_str(iface.to_str().unwrap()).unwrap(),
       })
   }
 }
@@ -67,7 +68,7 @@ fn get_file_value(path: &PathBuf) -> Option<String> {
   };
   let value = raw_value.trim_matches(newline);
   debug!("File {} value is: ::{}::", path.display(), value);
-  return Some(String::from_str(value));
+  return Some(String::from_str(value).unwrap());
 }
 
 fn is_interface_live(path: &PathBuf, noop: bool) -> bool {
